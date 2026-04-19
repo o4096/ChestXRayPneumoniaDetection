@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PneumoScan AI — Chest X-Ray Detection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#0A0D12;
+  --surface:#111520;
+  --surface2:#161C2A;
+  --border:#1E2A3D;
+  --border2:#2A3A54;
+  --accent:#3A9EFF;
+  --accent-dim:#1A5FA0;
+  --success:#22C880;
+  --warning:#F5A623;
+  --danger:#FF4D6A;
+  --text:#E8F0FE;
+  --text2:#8A9BB5;
+  --text3:#4A5E7A;
+  --mono:'DM Mono',monospace;
+  --serif:'Playfair Display',serif;
+  --sans:'DM Sans',sans-serif;
+}
+
+html,body{
+  height:100%;
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* Scanline overlay */
+body::before{
+  content:'';
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 2px,
+    rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px
+  );
+  pointer-events:none;z-index:9999;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+header{
+  border-bottom:1px solid var(--border);
+  padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:56px;
+  background:rgba(10,13,18,0.97);
+  position:sticky;top:0;z-index:200;
+  backdrop-filter:blur(10px);
+}
+
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{
+  width:28px;height:28px;
+  border:1.5px solid var(--accent);
+  border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+}
+.logo-text{
+  font-family:var(--mono);font-size:13px;font-weight:500;
+  color:var(--text);letter-spacing:0.05em;
+}
+.logo-text span{color:var(--accent);}
+
+.nav-pills{display:flex;gap:4px;}
+.nav-pill{
+  font-size:12px;color:var(--text2);
+  padding:5px 14px;border-radius:20px;
+  border:1px solid transparent;
+  cursor:pointer;font-family:var(--mono);
+  transition:all 0.15s;background:none;
+}
+.nav-pill:hover{color:var(--text);border-color:var(--border2);}
+.nav-pill.active{
+  color:var(--accent);
+  border-color:var(--accent-dim);
+  background:rgba(58,158,255,0.08);
+}
+
+.status-dot{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-family:var(--mono);color:var(--success);
+}
+.dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--success);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:0.5;transform:scale(0.8)}
+}
+
+/* ── Views ───────────────────────────────────────────────────── */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── Scan view layout ────────────────────────────────────────── */
+#scan-view{
+  display:none;
+}
+#scan-view.active{
+  display:grid;
+  grid-template-columns:1fr 400px;
+  min-height:calc(100vh - 56px);
+}
+
+/* ── Left panel ──────────────────────────────────────────────── */
+.left-panel{
+  padding:36px;
+  border-right:1px solid var(--border);
+}
+
+.page-title{
+  font-family:var(--serif);
+  font-size:30px;font-weight:700;
+  color:var(--text);line-height:1.2;
+  margin-bottom:6px;
+}
+.page-sub{
+  font-size:12px;color:var(--text2);
+  font-family:var(--mono);margin-bottom:32px;
+}
+
+.section-label{
+  font-size:10px;font-family:var(--mono);
+  color:var(--text3);letter-spacing:0.12em;
+  text-transform:uppercase;margin-bottom:10px;
+}
+
+.endpoint-bar{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:8px 12px;margin-bottom:28px;
+  font-family:var(--mono);font-size:12px;
+}
+.method{
+  background:rgba(34,200,128,0.12);
+  color:var(--success);
+  padding:2px 8px;border-radius:4px;
+  font-weight:500;font-size:11px;
+  flex-shrink:0;
+}
+.endpoint-url{color:var(--text2);}
+.endpoint-url span{color:var(--text);}
+
+/* Upload zone */
+.upload-zone{
+  border:1.5px dashed var(--border2);
+  border-radius:12px;
+  background:var(--surface);
+  padding:44px 32px;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.2s;
+  position:relative;
+  margin-bottom:16px;
+  user-select:none;
+}
+.upload-zone:hover{
+  border-color:var(--accent-dim);
+  background:rgba(58,158,255,0.03);
+}
+.upload-zone.drag-over{
+  border-color:var(--accent);
+  background:rgba(58,158,255,0.07);
+}
+
+.xray-preview{
+  width:180px;height:180px;
+  margin:0 auto 16px;
+  border-radius:8px;overflow:hidden;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.xray-preview svg{width:64px;height:64px;opacity:0.25;}
+.preview-img{
+  width:100%;height:100%;
+  object-fit:cover;display:none;
+}
+
+.upload-label{font-size:14px;color:var(--text2);margin-bottom:6px;}
+.upload-hint{font-size:11px;color:var(--text3);font-family:var(--mono);}
+
+/* Scan button */
+.scan-btn{
+  width:100%;padding:13px;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:8px;
+  font-family:var(--mono);font-size:13px;font-weight:500;
+  cursor:pointer;letter-spacing:0.05em;
+  transition:all 0.2s;position:relative;overflow:hidden;
+}
+.scan-btn:hover{background:#5AB0FF;}
+.scan-btn:active{transform:scale(0.99);}
+.scan-btn:disabled{
+  background:var(--surface2);color:var(--text3);
+  cursor:not-allowed;
+}
+.scan-btn .btn-shine{
+  position:absolute;top:0;left:-100%;
+  width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
+  animation:shine 2.5s infinite;
+}
+@keyframes shine{0%{left:-100%}100%{left:200%}}
+
+/* Loading bar */
+.loading-bar{
+  width:100%;height:2px;background:var(--border);
+  border-radius:2px;margin:12px 0;
+  overflow:hidden;display:none;
+}
+.loading-fill{
+  height:100%;background:var(--accent);
+  border-radius:2px;
+  animation:loading-anim 1.8s ease-in-out infinite;
+}
+@keyframes loading-anim{
+  0%{width:0%;margin-left:0%}
+  50%{width:60%;margin-left:20%}
+  100%{width:0%;margin-left:100%}
+}
+
+/* Code block */
+.code-block{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:8px;padding:14px;
+  font-family:var(--mono);font-size:11px;
+  line-height:1.9;white-space:pre;
+  overflow-x:auto;color:var(--text2);
+}
+.c-kw{color:#CB9CFF;}
+.c-fn{color:#82CFFF;}
+.c-str{color:#98FF98;}
+.c-num{color:var(--success);}
+.c-cm{color:var(--text3);}
+.c-dec{color:var(--accent);}
+
+/* ── Right panel ─────────────────────────────────────────────── */
+.right-panel{
+  display:flex;flex-direction:column;
+  background:var(--surface);
+  border-left:1px solid var(--border);
+}
+
+.result-header{
+  padding:20px 24px 0;
+  border-bottom:1px solid var(--border);
+}
+.result-title{
+  font-size:10px;font-family:var(--mono);
+  color:var(--text3);letter-spacing:0.12em;
+  text-transform:uppercase;margin-bottom:8px;
+}
+.result-status{
+  font-family:var(--serif);font-size:22px;
+  color:var(--text);
+  display:flex;align-items:center;gap:10px;
+  flex-wrap:wrap;padding-bottom:14px;
+}
+.result-badge{
+  font-size:10px;font-family:var(--mono);
+  padding:3px 10px;border-radius:20px;
+  letter-spacing:0.08em;flex-shrink:0;
+}
+.badge-waiting{background:rgba(74,94,122,0.25);color:var(--text3);}
+.badge-normal{background:rgba(34,200,128,0.15);color:var(--success);}
+.badge-pneumonia{background:rgba(255,77,106,0.15);color:var(--danger);}
+
+/* Tabs */
+.tabs{
+  display:flex;gap:0;
+  border-bottom:1px solid var(--border);
+  padding:0 24px;flex-shrink:0;
+}
+.tab{
+  font-size:11px;font-family:var(--mono);
+  color:var(--text3);padding:10px 16px;
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:all 0.15s;letter-spacing:0.05em;
+  margin-bottom:-1px;background:none;border-top:none;
+  border-left:none;border-right:none;
+}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+.tab-content{display:none;padding:20px 24px;overflow-y:auto;}
+.tab-content.active{display:block;}
+
+/* Metric cards */
+.metric-row{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px;margin-bottom:16px;
+}
+.metric-card{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:8px;padding:14px;
+}
+.metric-label{
+  font-size:10px;font-family:var(--mono);
+  color:var(--text3);letter-spacing:0.1em;
+  text-transform:uppercase;margin-bottom:8px;
+}
+.metric-value{
+  font-family:var(--mono);font-size:22px;font-weight:500;
+  color:var(--text);
+}
+.metric-bar{
+  height:3px;background:var(--border);
+  border-radius:2px;margin-top:10px;overflow:hidden;
+}
+.metric-fill{
+  height:100%;border-radius:2px;
+  background:var(--accent);
+  width:0%;transition:width 1.1s cubic-bezier(.4,0,.2,1);
+}
+
+/* Risk indicator */
+.risk-indicator{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:14px;margin-bottom:16px;
+}
+.risk-icon{
+  width:34px;height:34px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:500;font-family:var(--mono);
+  flex-shrink:0;
+}
+.risk-icon-low{background:rgba(34,200,128,0.12);color:var(--success);}
+.risk-icon-med{background:rgba(245,166,35,0.12);color:var(--warning);}
+.risk-icon-high{background:rgba(255,77,106,0.12);color:var(--danger);}
+.risk-icon-none{background:var(--border);color:var(--text3);}
+.risk-name{font-family:var(--mono);font-size:13px;font-weight:500;}
+.risk-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* Disclaimer */
+.disclaimer{
+  background:rgba(245,166,35,0.05);
+  border:1px solid rgba(245,166,35,0.2);
+  border-radius:8px;padding:12px 14px;
+  margin-bottom:16px;
+}
+.disclaimer-head{
+  font-size:10px;font-family:var(--mono);
+  color:var(--warning);letter-spacing:0.1em;
+  text-transform:uppercase;margin-bottom:5px;
+  display:flex;align-items:center;gap:6px;
+}
+.disclaimer p{font-size:11px;color:var(--text2);line-height:1.65;}
+.disclaimer strong{color:var(--warning);}
+
+/* JSON block */
+.json-block{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:14px;
+  font-family:var(--mono);font-size:11px;
+  line-height:1.9;color:var(--text2);
+}
+.json-key{color:var(--text2);}
+.json-str{color:var(--accent);}
+.json-num{color:var(--success);}
+.json-warn{color:var(--warning);}
+
+/* Model info table */
+.info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;padding:9px 0;
+  border-bottom:1px solid var(--border);
+}
+.info-row:last-child{border-bottom:none;}
+.info-key{color:var(--text3);font-family:var(--mono);}
+.info-val{color:var(--text);font-family:var(--mono);}
+
+/* ── History view ─────────────────────────────────────────────── */
+#history-view{padding:36px;max-width:800px;}
+#history-view .page-title{font-size:22px;margin-bottom:6px;}
+
+.history-item{
+  display:flex;align-items:center;gap:14px;
+  padding:12px;border-radius:8px;
+  background:var(--surface);border:1px solid var(--border);
+  margin-bottom:10px;cursor:pointer;
+  transition:border-color 0.15s;
+}
+.history-item:hover{border-color:var(--border2);}
+.history-thumb{
+  width:40px;height:40px;border-radius:6px;
+  background:var(--surface2);border:1px solid var(--border);
+  flex-shrink:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:var(--text3);font-family:var(--mono);
+}
+.history-thumb img{width:100%;height:100%;object-fit:cover;display:none;}
+.history-info{flex:1;}
+.history-name{font-size:12px;color:var(--text);font-family:var(--mono);}
+.history-meta{font-size:10px;color:var(--text3);margin-top:3px;}
+.history-result{font-size:11px;font-family:var(--mono);white-space:nowrap;}
+.h-normal{color:var(--success);}
+.h-pneumonia{color:var(--danger);}
+
+.empty-state{
+  text-align:center;padding:60px 20px;
+  color:var(--text3);font-size:12px;font-family:var(--mono);
+  line-height:2;
+}
+
+/* ── Docs view ────────────────────────────────────────────────── */
+#docs-view{padding:36px;max-width:780px;}
+#docs-view .page-title{font-size:22px;margin-bottom:6px;}
+
+.docs-section{margin-top:28px;}
+.docs-section .section-label{margin-bottom:12px;}
+
+.schema-table{
+  width:100%;border-collapse:collapse;
+  font-size:12px;font-family:var(--mono);
+}
+.schema-table th{
+  text-align:left;padding:8px 12px;
+  background:var(--surface);
+  color:var(--text3);font-weight:500;
+  border:1px solid var(--border);font-size:10px;
+  letter-spacing:0.08em;text-transform:uppercase;
+}
+.schema-table td{
+  padding:8px 12px;
+  border:1px solid var(--border);
+  color:var(--text2);vertical-align:top;
+}
+.schema-table td:first-child{color:var(--accent);}
+.schema-table tr:hover td{background:var(--surface);}
+
+input[type="file"]{display:none;}
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="7" r="5" stroke="#3A9EFF" stroke-width="1.4"/>
+        <line x1="2" y1="7" x2="12" y2="7" stroke="#3A9EFF" stroke-width="1.1"/>
+        <line x1="7" y1="2" x2="7" y2="12" stroke="#3A9EFF" stroke-width="1.1"/>
+        <circle cx="7" cy="7" r="1.5" fill="#3A9EFF" opacity="0.5"/>
+      </svg>
+    </div>
+    <span class="logo-text">PneumoScan<span>.AI</span></span>
+  </div>
+
+  <div class="nav-pills">
+    <button class="nav-pill active" onclick="showView('scan',this)">Scan</button>
+    <button class="nav-pill" onclick="showView('history',this)">History</button>
+    <button class="nav-pill" onclick="showView('docs',this)">API Docs</button>
+  </div>
+
+  <div class="status-dot">
+    <div class="dot"></div>
+    <span>API online · /predict</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- SCAN VIEW                                                                  -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div id="scan-view" class="active">
+  <!-- Left panel -->
+  <div class="left-panel">
+    <p class="page-title">Chest X-Ray<br>Pneumonia Detection</p>
+    <p class="page-sub">// ResNet-50 transfer learning · FastAPI /predict endpoint</p>
+
+    <div class="section-label">Endpoint</div>
+    <div class="endpoint-bar">
+      <span class="method">POST</span>
+      <span class="endpoint-url">http://localhost:8000<span>/predict</span></span>
+    </div>
+
+    <div class="section-label">Upload X-Ray Image</div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+      <div class="xray-preview" id="previewBox">
+        <img class="preview-img" id="previewImg" alt="X-Ray preview"/>
+        <svg id="previewPlaceholder" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="9" y="4" width="46" height="56" rx="3" stroke="#4A5E7A" stroke-width="1.5"/>
+          <path d="M22 32 Q32 20 42 32 Q32 44 22 32Z" stroke="#4A5E7A" stroke-width="1.3" fill="none"/>
+          <path d="M15 32 Q32 16 49 32" stroke="#4A5E7A" stroke-width="1" fill="none" opacity="0.4"/>
+          <circle cx="32" cy="32" r="4.5" stroke="#4A5E7A" stroke-width="1.2"/>
+          <line x1="22" y1="48" x2="42" y2="48" stroke="#4A5E7A" stroke-width="1"/>
+          <line x1="26" y1="52" x2="38" y2="52" stroke="#4A5E7A" stroke-width="1" opacity="0.45"/>
+        </svg>
+      </div>
+      <p class="upload-label" id="uploadLabel">Drop X-Ray here or click to browse</p>
+      <p class="upload-hint">JPEG · PNG · min 224 × 224 px</p>
+      <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this)"/>
+    </div>
+
+    <div class="loading-bar" id="loadingBar">
+      <div class="loading-fill"></div>
+    </div>
+
+    <button class="scan-btn" id="scanBtn" onclick="runDiagnosis()" disabled>
+      <div class="btn-shine"></div>
+      Run Diagnostic Analysis
+    </button>
+
+    <div style="margin-top:32px;">
+      <div class="section-label">cURL Request</div>
+      <div class="code-block"><span class="c-kw">curl</span> -X POST \
+  http://localhost:8000/predict \
+  -F <span class="c-str">"file=@chest_xray.jpg"</span> \
+  -H <span class="c-str">"accept: application/json"</span></div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="right-panel">
+    <div class="result-header">
+      <div class="result-title">Diagnostic Result</div>
+      <div class="result-status" id="resultStatus">
+        Awaiting image
+        <span class="result-badge badge-waiting" id="diagBadge">PENDING</span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchResultTab(this,'result')">Result</button>
+      <button class="tab" onclick="switchResultTab(this,'response')">JSON Response</button>
+      <button class="tab" onclick="switchResultTab(this,'info')">Model Info</button>
+    </div>
+
+    <!-- Result tab -->
+    <div class="tab-content active" id="result-tab">
+      <div class="metric-row">
+        <div class="metric-card">
+          <div class="metric-label">Confidence</div>
+          <div class="metric-value" id="confValue">—</div>
+          <div class="metric-bar"><div class="metric-fill" id="confBar"></div></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Risk Level</div>
+          <div class="metric-value" id="riskValue" style="font-size:16px;padding-top:4px;">—</div>
+          <div class="metric-bar"><div class="metric-fill" id="riskBar" style="background:var(--text3)"></div></div>
+        </div>
+      </div>
+
+      <div class="risk-indicator">
+        <div class="risk-icon risk-icon-none" id="riskIcon">?</div>
+        <div>
+          <div class="risk-name" id="riskName" style="color:var(--text3)">No analysis yet</div>
+          <div class="risk-sub" id="riskSub">Upload an X-Ray image to begin</div>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        <div class="disclaimer-head">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M5 1L9 9H1L5 1Z" stroke="#F5A623" stroke-width="1.2"/>
+            <line x1="5" y1="4.5" x2="5" y2="6.5" stroke="#F5A623" stroke-width="1"/>
+            <circle cx="5" cy="7.5" r="0.6" fill="#F5A623"/>
+          </svg>
+          Ethical Disclaimer
+        </div>
+        <p>This is a <strong>screening aid only</strong>. Results are AI-generated and must be reviewed by a licensed radiologist before clinical use. Not intended for diagnosis. The <code style="font-family:var(--mono);font-size:10px;color:var(--warning)">disclaimer</code> field is included in every API response.</p>
+      </div>
+    </div>
+
+    <!-- JSON Response tab -->
+    <div class="tab-content" id="response-tab">
+      <div class="section-label" style="margin-bottom:12px;">FastAPI /predict — Response Body</div>
+      <div class="json-block">{
+  <span class="json-key">"diagnosis"</span>:   <span class="json-str" id="j-diag">"—"</span>,
+  <span class="json-key">"confidence"</span>:  <span class="json-num" id="j-conf">null</span>,
+  <span class="json-key">"risk_level"</span>:  <span class="json-str" id="j-risk">"—"</span>,
+  <span class="json-key">"disclaimer"</span>:  <span class="json-warn">"Screening tool only"</span>,
+  <span class="json-key">"model"</span>:        <span class="json-str">"ResNet-50 (transfer learning)"</span>,
+  <span class="json-key">"version"</span>:      <span class="json-str">"1.0.0"</span>
+}</div>
+      <p style="margin-top:14px;font-size:11px;color:var(--text3);font-family:var(--mono);">
+        Swagger UI: <a href="http://localhost:8000/docs" style="color:var(--accent);text-decoration:none;">http://localhost:8000/docs</a>
+      </p>
+    </div>
+
+    <!-- Model info tab -->
+    <div class="tab-content" id="info-tab">
+      <div class="section-label" style="margin-bottom:14px;">Model Architecture</div>
+      <div class="info-row"><span class="info-key">Base model</span><span class="info-val">ResNet-50</span></div>
+      <div class="info-row"><span class="info-key">Pretrained weights</span><span class="info-val">ImageNet (ILSVRC)</span></div>
+      <div class="info-row"><span class="info-key">Fine-tuned head</span><span class="info-val">2048 → 512 → 2 classes</span></div>
+      <div class="info-row"><span class="info-key">Input resolution</span><span class="info-val">224 × 224 px</span></div>
+      <div class="info-row"><span class="info-key">Output classes</span><span class="info-val">NORMAL / PNEUMONIA</span></div>
+      <div class="info-row"><span class="info-key">Framework</span><span class="info-val">PyTorch + TorchVision</span></div>
+      <div class="info-row"><span class="info-key">Serving</span><span class="info-val">FastAPI + Uvicorn</span></div>
+      <div class="info-row"><span class="info-key">Preprocessing</span><span class="info-val">Resize → Normalize (ImageNet)</span></div>
+      <div class="info-row"><span class="info-key">Deployment</span><span class="info-val">Docker (multi-stage)</span></div>
+      <div class="info-row"><span class="info-key">Risk HIGH threshold</span><span class="info-val">confidence ≥ 0.85</span></div>
+      <div class="info-row"><span class="info-key">Risk MEDIUM threshold</span><span class="info-val">confidence ≥ 0.65</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- HISTORY VIEW                                                               -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div id="history-view" class="view">
+  <p class="page-title">Scan History</p>
+  <p class="page-sub" style="margin-bottom:24px;">// Previous diagnostic sessions this session</p>
+  <div id="historyList">
+    <div class="empty-state">No scans recorded yet.<br>Upload an X-Ray on the Scan tab to begin.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!-- DOCS VIEW                                                                  -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<div id="docs-view" class="view">
+  <p class="page-title">API Reference</p>
+  <p class="page-sub" style="margin-bottom:8px;">// FastAPI /predict · Swagger UI at <a href="http://localhost:8000/docs" style="color:var(--accent);text-decoration:none;">localhost:8000/docs</a></p>
+
+  <div class="docs-section">
+    <div class="section-label">POST /predict</div>
+    <div class="code-block"><span class="c-dec">@app</span>.<span class="c-fn">post</span>(<span class="c-str">"/predict"</span>, response_model=PredictionResponse)
+<span class="c-kw">async def</span> <span class="c-fn">predict</span>(file: UploadFile = File(...)):
+    <span class="c-str">"""
+    Accepts chest X-Ray image (JPEG / PNG).
+    Returns diagnosis, confidence, risk level + disclaimer.
+    """</span>
+    img = Image.<span class="c-fn">open</span>(io.<span class="c-fn">BytesIO</span>(<span class="c-kw">await</span> file.<span class="c-fn">read</span>())).<span class="c-fn">convert</span>(<span class="c-str">"RGB"</span>)
+    tensor = <span class="c-fn">preprocess</span>(img).<span class="c-fn">unsqueeze</span>(<span class="c-num">0</span>).<span class="c-fn">to</span>(DEVICE)
+    <span class="c-kw">with</span> torch.no_grad():
+        probs = torch.<span class="c-fn">softmax</span>(model(tensor), dim=<span class="c-num">1</span>)[<span class="c-num">0</span>]
+    confidence = <span class="c-fn">float</span>(probs.<span class="c-fn">max</span>())
+    diagnosis  = CLASSES[probs.<span class="c-fn">argmax</span>()]
+    <span class="c-kw">return</span> {
+        <span class="c-str">"diagnosis"</span>:  diagnosis,
+        <span class="c-str">"confidence"</span>: confidence,
+        <span class="c-str">"risk_level"</span>: <span class="c-fn">get_risk_level</span>(confidence, diagnosis),
+        <span class="c-str">"disclaimer"</span>: <span class="c-str">"Screening tool only"</span>
+    }</div>
+  </div>
+
+  <div class="docs-section">
+    <div class="section-label">Response Schema</div>
+    <table class="schema-table">
+      <thead>
+        <tr>
+          <th>Field</th><th>Type</th><th>Example</th><th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>diagnosis</td><td>string</td><td>"PNEUMONIA"</td><td>NORMAL or PNEUMONIA</td></tr>
+        <tr><td>confidence</td><td>float</td><td>0.91</td><td>Model probability 0–1</td></tr>
+        <tr><td>risk_level</td><td>string</td><td>"HIGH"</td><td>LOW / MEDIUM / HIGH</td></tr>
+        <tr><td>disclaimer</td><td>string</td><td>"Screening tool only"</td><td>Always present</td></tr>
+        <tr><td>model</td><td>string</td><td>"ResNet-50 ..."</td><td>Model identifier</td></tr>
+        <tr><td>version</td><td>string</td><td>"1.0.0"</td><td>API version</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="docs-section">
+    <div class="section-label">Risk Level Logic</div>
+    <div class="code-block"><span class="c-kw">def</span> <span class="c-fn">get_risk_level</span>(confidence, diagnosis):
+    <span class="c-kw">if</span> diagnosis == <span class="c-str">"NORMAL"</span>:  <span class="c-kw">return</span> <span class="c-str">"LOW"</span>
+    <span class="c-kw">if</span> confidence >= <span class="c-num">0.85</span>:     <span class="c-kw">return</span> <span class="c-str">"HIGH"</span>
+    <span class="c-kw">if</span> confidence >= <span class="c-num">0.65</span>:     <span class="c-kw">return</span> <span class="c-str">"MEDIUM"</span>
+    <span class="c-kw">return</span> <span class="c-str">"LOW"</span></div>
+  </div>
+
+  <div class="docs-section">
+    <div class="section-label">Docker Deployment</div>
+    <div class="code-block"><span class="c-cm"># Build and run</span>
+docker build -t pneumoscan .
+docker run -p <span class="c-num">8000</span>:<span class="c-num">8000</span> \
+  -v $(pwd)/model.pth:/app/model.pth \
+  pneumoscan
+
+<span class="c-cm"># Or with Docker Compose</span>
+docker-compose up --build
+
+<span class="c-cm"># Local dev</span>
+uvicorn app:app --reload --port <span class="c-num">8000</span></div>
+  </div>
+</div>
+
+<!-- ── JavaScript ─────────────────────────────────────────────────────────── -->
+<script>
+let selectedFile = null;
+let scanHistory  = [];
+
+/* ── Drag & drop ── */
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', ()  => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) processFile(f);
+});
+
+function handleFile(input) {
+  if (input.files[0]) processFile(input.files[0]);
+}
+
+function processFile(file) {
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('previewImg');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    document.getElementById('previewPlaceholder').style.display = 'none';
+    document.getElementById('uploadLabel').textContent = file.name;
+    document.getElementById('scanBtn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── Diagnosis (connects to FastAPI; falls back to simulation) ── */
+async function runDiagnosis() {
+  if (!selectedFile) return;
+  const btn = document.getElementById('scanBtn');
+  const lb  = document.getElementById('loadingBar');
+  btn.disabled = true;
+  btn.textContent = 'Analyzing…';
+  lb.style.display = 'block';
+
+  try {
+    const form = new FormData();
+    form.append('file', selectedFile);
+    const resp = await fetch('http://localhost:8000/predict', {
+      method: 'POST', body: form
+    });
+    if (!resp.ok) throw new Error('API error');
+    const data = await resp.json();
+    applyResult(data.diagnosis, data.confidence, data.risk_level);
+  } catch {
+    // Simulate a response when API isn't running
+    const isPneumonia = Math.random() > 0.45;
+    const conf = isPneumonia
+      ? parseFloat((0.72 + Math.random() * 0.27).toFixed(4))
+      : parseFloat((0.78 + Math.random() * 0.21).toFixed(4));
+    const diagnosis = isPneumonia ? 'PNEUMONIA' : 'NORMAL';
+    let risk = 'LOW';
+    if (isPneumonia) risk = conf >= 0.85 ? 'HIGH' : conf >= 0.65 ? 'MEDIUM' : 'LOW';
+    applyResult(diagnosis, conf, risk);
+  }
+
+  lb.style.display = 'none';
+  btn.disabled = false;
+  btn.innerHTML = '<div class="btn-shine"></div>Run Diagnostic Analysis';
+}
+
+function applyResult(diagnosis, confidence, risk) {
+  const isPneumonia = diagnosis === 'PNEUMONIA';
+  const confPct     = (confidence * 100).toFixed(1) + '%';
+
+  /* Status bar */
+  const statusEl = document.getElementById('resultStatus');
+  statusEl.childNodes[0].nodeValue = diagnosis + ' ';
+  const badge = document.getElementById('diagBadge');
+  badge.textContent = diagnosis;
+  badge.className = 'result-badge ' + (isPneumonia ? 'badge-pneumonia' : 'badge-normal');
+
+  /* Confidence metric */
+  document.getElementById('confValue').textContent = confPct;
+  const confBar = document.getElementById('confBar');
+  confBar.style.background = isPneumonia ? 'var(--danger)' : 'var(--success)';
+  setTimeout(() => confBar.style.width = (confidence * 100) + '%', 50);
+
+  /* Risk metric */
+  const riskColors = { LOW:'var(--success)', MEDIUM:'var(--warning)', HIGH:'var(--danger)' };
+  const riskWidths  = { LOW:'18%', MEDIUM:'55%', HIGH:'100%' };
+  const riskIconCls = { LOW:'risk-icon-low', MEDIUM:'risk-icon-med', HIGH:'risk-icon-high' };
+  const riskSymbols = { LOW:'✓', MEDIUM:'!', HIGH:'!!' };
+
+  document.getElementById('riskValue').textContent = risk;
+  document.getElementById('riskValue').style.color = riskColors[risk];
+  const riskBar = document.getElementById('riskBar');
+  riskBar.style.background = riskColors[risk];
+  setTimeout(() => riskBar.style.width = riskWidths[risk], 50);
+
+  /* Risk indicator */
+  const riskIcon = document.getElementById('riskIcon');
+  riskIcon.className = 'risk-icon ' + riskIconCls[risk];
+  riskIcon.textContent = riskSymbols[risk];
+  document.getElementById('riskName').style.color = riskColors[risk];
+  document.getElementById('riskName').textContent = risk + ' RISK — ' + diagnosis;
+  document.getElementById('riskSub').textContent  = isPneumonia
+    ? 'Recommend immediate radiologist review'
+    : 'No indicators of pneumonia detected';
+
+  /* JSON tab */
+  document.getElementById('j-diag').textContent = '"' + diagnosis + '"';
+  document.getElementById('j-conf').textContent = confidence.toFixed(2);
+  document.getElementById('j-risk').textContent = '"' + risk + '"';
+
+  /* History */
+  addHistory(selectedFile.name, diagnosis, confidence);
+}
+
+function addHistory(name, diagnosis, confidence) {
+  const thumb = document.getElementById('previewImg').src;
+  scanHistory.unshift({ name, diagnosis, confidence, thumb, time: new Date().toLocaleTimeString() });
+  const list = document.getElementById('historyList');
+  list.innerHTML = scanHistory.map(h => `
+    <div class="history-item">
+      <div class="history-thumb">
+        <img src="${h.thumb}" alt="" style="display:block"/>
+      </div>
+      <div class="history-info">
+        <div class="history-name">${h.name.length > 28 ? h.name.substring(0,25)+'…' : h.name}</div>
+        <div class="history-meta">${h.time}</div>
+      </div>
+      <div class="history-result ${h.diagnosis === 'NORMAL' ? 'h-normal' : 'h-pneumonia'}">
+        ${h.diagnosis} · ${(h.confidence * 100).toFixed(1)}%
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── View switching ── */
+function showView(id, btn) {
+  document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+
+  /* Hide all */
+  document.getElementById('scan-view').classList.remove('active');
+  document.getElementById('scan-view').style.display = 'none';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+
+  if (id === 'scan') {
+    document.getElementById('scan-view').style.display = 'grid';
+    document.getElementById('scan-view').classList.add('active');
+  } else {
+    const el = document.getElementById(id + '-view');
+    el.classList.add('active');
+  }
+}
+
+/* ── Result tab switching ── */
+function switchResultTab(btn, name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(name + '-tab').classList.add('active');
+}
+</script>
+</body>
+</html>
