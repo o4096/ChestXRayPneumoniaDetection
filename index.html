@@ -63,10 +63,11 @@ html,body{
   color:var(--text);line-height:1.2;
   margin-bottom:6px;
 }
-.page-sub{
+/* DO NOT DELETE CHECK CLASS USAGE */
+/* .page-sub{
   font-size:12px;color:var(--text2);
   font-family:var(--mono);margin-bottom:32px;
-}
+} */
 
 .section-label{
   font-size:10px;font-family:var(--mono);
@@ -74,14 +75,6 @@ html,body{
   text-transform:uppercase;margin-bottom:10px;
 }
 
-.endpoint-bar{
-  display:flex;align-items:center;gap:8px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:8px 12px;margin-bottom:28px;
-  font-family:var(--mono);font-size:12px;
-}
 .method{
   background:rgba(34,200,128,0.12);
   color:var(--success);
@@ -89,9 +82,6 @@ html,body{
   font-weight:500;font-size:11px;
   flex-shrink:0;
 }
-.endpoint-url{color:var(--text2);}
-.endpoint-url span{color:var(--text);}
-
 /* Upload zone */
 .upload-zone{
   border:1.5px dashed var(--border2);
@@ -173,7 +163,7 @@ html,body{
 }
 
 /* Code block */
-.code-block{
+/* .code-block{
   background:var(--bg);
   border:1px solid var(--border);
   border-radius:8px;padding:14px;
@@ -186,7 +176,7 @@ html,body{
 .c-str{color:#98FF98;}
 .c-num{color:var(--success);}
 .c-cm{color:var(--text3);}
-.c-dec{color:var(--accent);}
+.c-dec{color:var(--accent);} */
 
 /* ── Right panel ─────────────────────────────────────────────── */
 .right-panel{
@@ -316,50 +306,17 @@ html,body{
 .json-warn{color:var(--warning);}
 
 /* Model info table */
-.info-row{
+/* .info-row{
   display:flex;justify-content:space-between;align-items:center;
   font-size:12px;padding:9px 0;
   border-bottom:1px solid var(--border);
 }
 .info-row:last-child{border-bottom:none;}
 .info-key{color:var(--text3);font-family:var(--mono);}
-.info-val{color:var(--text);font-family:var(--mono);}
-
-/* ── History view ─────────────────────────────────────────────── */
-#history-view{padding:36px;max-width:800px;}
-#history-view .page-title{font-size:22px;margin-bottom:6px;}
-
-.history-item{
-  display:flex;align-items:center;gap:14px;
-  padding:12px;border-radius:8px;
-  background:var(--surface);border:1px solid var(--border);
-  margin-bottom:10px;cursor:pointer;
-  transition:border-color 0.15s;
-}
-.history-item:hover{border-color:var(--border2);}
-.history-thumb{
-  width:40px;height:40px;border-radius:6px;
-  background:var(--surface2);border:1px solid var(--border);
-  flex-shrink:0;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-  font-size:9px;color:var(--text3);font-family:var(--mono);
-}
-.history-thumb img{width:100%;height:100%;object-fit:cover;display:none;}
-.history-info{flex:1;}
-.history-name{font-size:12px;color:var(--text);font-family:var(--mono);}
-.history-meta{font-size:10px;color:var(--text3);margin-top:3px;}
-.history-result{font-size:11px;font-family:var(--mono);white-space:nowrap;}
-.h-normal{color:var(--success);}
-.h-pneumonia{color:var(--danger);}
-
-.empty-state{
-  text-align:center;padding:60px 20px;
-  color:var(--text3);font-size:12px;font-family:var(--mono);
-  line-height:2;
-}
+.info-val{color:var(--text);font-family:var(--mono);} */
 
 /* ── Docs view ────────────────────────────────────────────────── */
-#docs-view{padding:36px;max-width:780px;}
+/* #docs-view{padding:36px;max-width:780px;}
 #docs-view .page-title{font-size:22px;margin-bottom:6px;}
 
 .docs-section{margin-top:28px;}
@@ -383,8 +340,8 @@ html,body{
 }
 .schema-table td:first-child{color:var(--accent);}
 .schema-table tr:hover td{background:var(--surface);}
-
-input[type="file"]{display:none;}
+*/
+input[type="file"]{display:none;} 
 </style>
 </head>
 <body>
@@ -396,13 +353,7 @@ input[type="file"]{display:none;}
   <!-- Left panel -->
   <div class="left-panel">
     <p class="page-title">Chest X-Ray<br>Pneumonia Detection</p>
-    <p class="page-sub">// ResNet-50 transfer learning · FastAPI /predict endpoint</p>
-
-    <div class="section-label">Endpoint</div>
-    <div class="endpoint-bar">
-      <span class="method">POST</span>
-      <span class="endpoint-url">http://localhost:8000<span>/predict</span></span>
-    </div>
+    <!-- <p class="page-sub">// ResNet-50 transfer learning · FastAPI /predict endpoint</p> -->
 
     <div class="section-label">Upload X-Ray Image</div>
     <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
@@ -430,14 +381,6 @@ input[type="file"]{display:none;}
       <div class="btn-shine"></div>
       Run Diagnostic Analysis
     </button>
-
-    <div style="margin-top:32px;">
-      <div class="section-label">cURL Request</div>
-      <div class="code-block"><span class="c-kw">curl</span> -X POST \
-  http://localhost:8000/predict \
-  -F <span class="c-str">"file=@chest_xray.jpg"</span> \
-  -H <span class="c-str">"accept: application/json"</span></div>
-    </div>
   </div>
 
   <!-- Right panel -->
@@ -453,7 +396,7 @@ input[type="file"]{display:none;}
     <div class="tabs">
       <button class="tab active" onclick="switchResultTab(this,'result')">Result</button>
       <button class="tab" onclick="switchResultTab(this,'response')">JSON Response</button>
-      <button class="tab" onclick="switchResultTab(this,'info')">Model Info</button>
+      <!-- <button class="tab" onclick="switchResultTab(this,'info')">Model Info</button> -->
     </div>
 
     <!-- Result tab -->
@@ -509,9 +452,9 @@ input[type="file"]{display:none;}
     </div>
 
     <!-- Model info tab -->
-    <div class="tab-content" id="info-tab">
+    <!-- <div class="tab-content" id="info-tab">
       <div class="section-label" style="margin-bottom:14px;">Model Architecture</div>
-      <div class="info-row"><span class="info-key">Base model</span><span class="info-val">ResNet-50</span></div>
+      <div class="info-row"><span class="info-key">Base model</span><span class="info-val">ResNet-18</span></div>
       <div class="info-row"><span class="info-key">Pretrained weights</span><span class="info-val">ImageNet (ILSVRC)</span></div>
       <div class="info-row"><span class="info-key">Fine-tuned head</span><span class="info-val">2048 → 512 → 2 classes</span></div>
       <div class="info-row"><span class="info-key">Input resolution</span><span class="info-val">224 × 224 px</span></div>
@@ -522,25 +465,14 @@ input[type="file"]{display:none;}
       <div class="info-row"><span class="info-key">Deployment</span><span class="info-val">Docker (multi-stage)</span></div>
       <div class="info-row"><span class="info-key">Risk HIGH threshold</span><span class="info-val">confidence ≥ 0.85</span></div>
       <div class="info-row"><span class="info-key">Risk MEDIUM threshold</span><span class="info-val">confidence ≥ 0.65</span></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!-- HISTORY VIEW                                                               -->
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<div id="history-view" class="view">
-  <p class="page-title">Scan History</p>
-  <p class="page-sub" style="margin-bottom:24px;">// Previous diagnostic sessions this session</p>
-  <div id="historyList">
-    <div class="empty-state">No scans recorded yet.<br>Upload an X-Ray on the Scan tab to begin.</div>
+    </div> -->
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <!-- DOCS VIEW                                                                  -->
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
-<div id="docs-view" class="view">
+<!-- <div id="docs-view" class="view">
   <p class="page-title">API Reference</p>
   <p class="page-sub" style="margin-bottom:8px;">// FastAPI /predict · Swagger UI at <a href="http://localhost:8000/docs" style="color:var(--accent);text-decoration:none;">localhost:8000/docs</a></p>
 
@@ -608,12 +540,11 @@ docker-compose up --build
 <span class="c-cm"># Local dev</span>
 uvicorn app:app --reload --port <span class="c-num">8000</span></div>
   </div>
-</div>
+</div> -->
 
 <!-- ── JavaScript ─────────────────────────────────────────────────────────── -->
 <script>
 let selectedFile = null;
-let scanHistory  = [];
 
 /* ── Drag & drop ── */
 const uploadZone = document.getElementById('uploadZone');
@@ -653,7 +584,6 @@ async function runDiagnosis() {
   btn.textContent = 'Analyzing…';
   lb.style.display = 'block';
 
-  // try {
     const form = new FormData();
     form.append('file', selectedFile);
     const resp = await fetch('http://localhost:8000/predict', {
@@ -664,19 +594,6 @@ async function runDiagnosis() {
     console.log(data)
     applyResult(data.class, data.confidence);
     console.log("work");
-  // } 
-  // catch {
-  //   // Simulate a response when API isn't running
-  //   const isPneumonia = Math.random() > 0.45;
-  //   const conf = isPneumonia
-  //     ? parseFloat((0.72 + Math.random() * 0.27).toFixed(4))
-  //     : parseFloat((0.78 + Math.random() * 0.21).toFixed(4));
-  //   const diagnosis = isPneumonia ? 'PNEUMONIA' : 'NORMAL';
-  //   let risk = 'LOW';
-  //   if (isPneumonia) risk = conf >= 0.85 ? 'HIGH' : conf >= 0.65 ? 'MEDIUM' : 'LOW';
-  //   // applyResult(diagnosis, conf, risk);
-  //   console.log("simulation");
-  // }
 
   lb.style.display = 'none';
   btn.disabled = false;
@@ -730,28 +647,6 @@ function applyResult(diagnosis, confidence) {
   document.getElementById('j-conf').textContent = confidence.toFixed(2);
   document.getElementById('j-risk').textContent = '"' + risk + '"';
 
-  /* History */
-  addHistory(selectedFile.name, diagnosis, confidence);
-}
-
-function addHistory(name, diagnosis, confidence) {
-  const thumb = document.getElementById('previewImg').src;
-  scanHistory.unshift({ name, diagnosis, confidence, thumb, time: new Date().toLocaleTimeString() });
-  const list = document.getElementById('historyList');
-  list.innerHTML = scanHistory.map(h => `
-    <div class="history-item">
-      <div class="history-thumb">
-        <img src="${h.thumb}" alt="" style="display:block"/>
-      </div>
-      <div class="history-info">
-        <div class="history-name">${h.name.length > 28 ? h.name.substring(0,25)+'…' : h.name}</div>
-        <div class="history-meta">${h.time}</div>
-      </div>
-      <div class="history-result ${h.diagnosis === 'NORMAL' ? 'h-normal' : 'h-pneumonia'}">
-        ${h.diagnosis} · ${(h.confidence * 100).toFixed(1)}%
-      </div>
-    </div>
-  `).join('');
 }
 
 /* ── View switching ── */
