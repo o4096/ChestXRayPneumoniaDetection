@@ -37,70 +37,6 @@ html,body{
   overflow-x:hidden;
 }
 
-/* Scanline overlay */
-body::before{
-  content:'';
-  position:fixed;top:0;left:0;right:0;bottom:0;
-  background:repeating-linear-gradient(
-    0deg,transparent,transparent 2px,
-    rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px
-  );
-  pointer-events:none;z-index:9999;
-}
-
-/* ── Header ──────────────────────────────────────────────────── */
-header{
-  border-bottom:1px solid var(--border);
-  padding:0 32px;
-  display:flex;align-items:center;justify-content:space-between;
-  height:56px;
-  background:rgba(10,13,18,0.97);
-  position:sticky;top:0;z-index:200;
-  backdrop-filter:blur(10px);
-}
-
-.logo{display:flex;align-items:center;gap:10px;}
-.logo-icon{
-  width:28px;height:28px;
-  border:1.5px solid var(--accent);
-  border-radius:4px;
-  display:flex;align-items:center;justify-content:center;
-}
-.logo-text{
-  font-family:var(--mono);font-size:13px;font-weight:500;
-  color:var(--text);letter-spacing:0.05em;
-}
-.logo-text span{color:var(--accent);}
-
-.nav-pills{display:flex;gap:4px;}
-.nav-pill{
-  font-size:12px;color:var(--text2);
-  padding:5px 14px;border-radius:20px;
-  border:1px solid transparent;
-  cursor:pointer;font-family:var(--mono);
-  transition:all 0.15s;background:none;
-}
-.nav-pill:hover{color:var(--text);border-color:var(--border2);}
-.nav-pill.active{
-  color:var(--accent);
-  border-color:var(--accent-dim);
-  background:rgba(58,158,255,0.08);
-}
-
-.status-dot{
-  display:flex;align-items:center;gap:6px;
-  font-size:11px;font-family:var(--mono);color:var(--success);
-}
-.dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--success);
-  animation:pulse 2s infinite;
-}
-@keyframes pulse{
-  0%,100%{opacity:1;transform:scale(1)}
-  50%{opacity:0.5;transform:scale(0.8)}
-}
-
 /* ── Views ───────────────────────────────────────────────────── */
 .view{display:none;}
 .view.active{display:block;}
@@ -453,32 +389,6 @@ input[type="file"]{display:none;}
 </head>
 <body>
 
-<!-- ── Header ─────────────────────────────────────────────────────────────── -->
-<header>
-  <div class="logo">
-    <div class="logo-icon">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <circle cx="7" cy="7" r="5" stroke="#3A9EFF" stroke-width="1.4"/>
-        <line x1="2" y1="7" x2="12" y2="7" stroke="#3A9EFF" stroke-width="1.1"/>
-        <line x1="7" y1="2" x2="7" y2="12" stroke="#3A9EFF" stroke-width="1.1"/>
-        <circle cx="7" cy="7" r="1.5" fill="#3A9EFF" opacity="0.5"/>
-      </svg>
-    </div>
-    <span class="logo-text">PneumoScan<span>.AI</span></span>
-  </div>
-
-  <div class="nav-pills">
-    <button class="nav-pill active" onclick="showView('scan',this)">Scan</button>
-    <button class="nav-pill" onclick="showView('history',this)">History</button>
-    <button class="nav-pill" onclick="showView('docs',this)">API Docs</button>
-  </div>
-
-  <div class="status-dot">
-    <div class="dot"></div>
-    <span>API online · /predict</span>
-  </div>
-</header>
-
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <!-- SCAN VIEW                                                                  -->
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
@@ -743,7 +653,7 @@ async function runDiagnosis() {
   btn.textContent = 'Analyzing…';
   lb.style.display = 'block';
 
-  try {
+  // try {
     const form = new FormData();
     form.append('file', selectedFile);
     const resp = await fetch('http://localhost:8000/predict', {
@@ -751,28 +661,35 @@ async function runDiagnosis() {
     });
     if (!resp.ok) throw new Error('API error');
     const data = await resp.json();
-    applyResult(data.diagnosis, data.confidence, data.risk_level);
-  } catch {
-    // Simulate a response when API isn't running
-    const isPneumonia = Math.random() > 0.45;
-    const conf = isPneumonia
-      ? parseFloat((0.72 + Math.random() * 0.27).toFixed(4))
-      : parseFloat((0.78 + Math.random() * 0.21).toFixed(4));
-    const diagnosis = isPneumonia ? 'PNEUMONIA' : 'NORMAL';
-    let risk = 'LOW';
-    if (isPneumonia) risk = conf >= 0.85 ? 'HIGH' : conf >= 0.65 ? 'MEDIUM' : 'LOW';
-    applyResult(diagnosis, conf, risk);
-  }
+    console.log(data)
+    applyResult(data.class, data.confidence);
+    console.log("work");
+  // } 
+  // catch {
+  //   // Simulate a response when API isn't running
+  //   const isPneumonia = Math.random() > 0.45;
+  //   const conf = isPneumonia
+  //     ? parseFloat((0.72 + Math.random() * 0.27).toFixed(4))
+  //     : parseFloat((0.78 + Math.random() * 0.21).toFixed(4));
+  //   const diagnosis = isPneumonia ? 'PNEUMONIA' : 'NORMAL';
+  //   let risk = 'LOW';
+  //   if (isPneumonia) risk = conf >= 0.85 ? 'HIGH' : conf >= 0.65 ? 'MEDIUM' : 'LOW';
+  //   // applyResult(diagnosis, conf, risk);
+  //   console.log("simulation");
+  // }
 
   lb.style.display = 'none';
   btn.disabled = false;
   btn.innerHTML = '<div class="btn-shine"></div>Run Diagnostic Analysis';
 }
 
-function applyResult(diagnosis, confidence, risk) {
-  const isPneumonia = diagnosis === 'PNEUMONIA';
-  const confPct     = (confidence * 100).toFixed(1) + '%';
-
+function applyResult(diagnosis, confidence) {
+  const isPneumonia = diagnosis === "PNEUMONIA";
+  const pct  = (confidence * 100).toFixed(1);
+  const risk = (isPneumonia) ? 
+  ((pct > 61) ? ("HIGH") : ((pct > 25) ? ("MEDIUM") : ("LOW"))) :
+  ((pct > 61) ? ("LOW") : ((pct > 25) ? ("MEDIUM") : ("HIGH")));
+  const confPct = pct + '%';
   /* Status bar */
   const statusEl = document.getElementById('resultStatus');
   statusEl.childNodes[0].nodeValue = diagnosis + ' ';
