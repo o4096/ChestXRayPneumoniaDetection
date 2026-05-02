@@ -13,7 +13,7 @@ COPY app.py .
 COPY utils.py .
 COPY xray_classifier.json .
 COPY xray_classifier.pth .
-#COPY index.html .
+COPY index.html .
 
 EXPOSE 8000
 
