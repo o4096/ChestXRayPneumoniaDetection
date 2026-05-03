@@ -29,6 +29,12 @@ async def predict(file: UploadFile = File(...)):
     tensor = preprocess(img).unsqueeze(0)
     with torch.no_grad():
         probs = torch.softmax(model(tensor), dim=1)[0]
-    return {'class': config['classes'][probs.argmax()],
-            'confidence': float(probs.max())}
+        classification = config['classes'][probs.argmax()]
+        confidence = float(probs.max())
+        pct = round(confidence * 100, 1)
+        risk_level = ("HIGH" if pct > 61 else "MEDIUM" if pct > 25 else "LOW") if classification == 'PNEUMONIA' else ("LOW" if pct > 61 else "MEDIUM" if pct > 25 else "HIGH")
+    return {'class': classification,
+            'confidence': confidence,
+            'risk_level': risk_level}
+           
 

@@ -37,15 +37,7 @@ html,body{
   overflow-x:hidden;
 }
 
-/* ── Views ───────────────────────────────────────────────────── */
-.view{display:none;}
-.view.active{display:block;}
-
-/* ── Scan view layout ────────────────────────────────────────── */
 #scan-view{
-  display:none;
-}
-#scan-view.active{
   display:grid;
   grid-template-columns:1fr 400px;
   min-height:calc(100vh - 56px);
@@ -63,11 +55,7 @@ html,body{
   color:var(--text);line-height:1.2;
   margin-bottom:6px;
 }
-/* DO NOT DELETE CHECK CLASS USAGE */
-/* .page-sub{
-  font-size:12px;color:var(--text2);
-  font-family:var(--mono);margin-bottom:32px;
-} */
+
 
 .section-label{
   font-size:10px;font-family:var(--mono);
@@ -75,13 +63,6 @@ html,body{
   text-transform:uppercase;margin-bottom:10px;
 }
 
-.method{
-  background:rgba(34,200,128,0.12);
-  color:var(--success);
-  padding:2px 8px;border-radius:4px;
-  font-weight:500;font-size:11px;
-  flex-shrink:0;
-}
 /* Upload zone */
 .upload-zone{
   border:1.5px dashed var(--border2);
@@ -120,7 +101,6 @@ html,body{
 }
 
 .upload-label{font-size:14px;color:var(--text2);margin-bottom:6px;}
-.upload-hint{font-size:11px;color:var(--text3);font-family:var(--mono);}
 
 /* Scan button */
 .scan-btn{
@@ -137,46 +117,6 @@ html,body{
   background:var(--surface2);color:var(--text3);
   cursor:not-allowed;
 }
-.scan-btn .btn-shine{
-  position:absolute;top:0;left:-100%;
-  width:60%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
-  animation:shine 2.5s infinite;
-}
-@keyframes shine{0%{left:-100%}100%{left:200%}}
-
-/* Loading bar */
-.loading-bar{
-  width:100%;height:2px;background:var(--border);
-  border-radius:2px;margin:12px 0;
-  overflow:hidden;display:none;
-}
-.loading-fill{
-  height:100%;background:var(--accent);
-  border-radius:2px;
-  animation:loading-anim 1.8s ease-in-out infinite;
-}
-@keyframes loading-anim{
-  0%{width:0%;margin-left:0%}
-  50%{width:60%;margin-left:20%}
-  100%{width:0%;margin-left:100%}
-}
-
-/* Code block */
-/* .code-block{
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:8px;padding:14px;
-  font-family:var(--mono);font-size:11px;
-  line-height:1.9;white-space:pre;
-  overflow-x:auto;color:var(--text2);
-}
-.c-kw{color:#CB9CFF;}
-.c-fn{color:#82CFFF;}
-.c-str{color:#98FF98;}
-.c-num{color:var(--success);}
-.c-cm{color:var(--text3);}
-.c-dec{color:var(--accent);} */
 
 /* ── Right panel ─────────────────────────────────────────────── */
 .right-panel{
@@ -200,14 +140,6 @@ html,body{
   display:flex;align-items:center;gap:10px;
   flex-wrap:wrap;padding-bottom:14px;
 }
-.result-badge{
-  font-size:10px;font-family:var(--mono);
-  padding:3px 10px;border-radius:20px;
-  letter-spacing:0.08em;flex-shrink:0;
-}
-.badge-waiting{background:rgba(74,94,122,0.25);color:var(--text3);}
-.badge-normal{background:rgba(34,200,128,0.15);color:var(--success);}
-.badge-pneumonia{background:rgba(255,77,106,0.15);color:var(--danger);}
 
 /* Tabs */
 .tabs{
@@ -270,10 +202,7 @@ html,body{
   font-size:15px;font-weight:500;font-family:var(--mono);
   flex-shrink:0;
 }
-.risk-icon-low{background:rgba(34,200,128,0.12);color:var(--success);}
-.risk-icon-med{background:rgba(245,166,35,0.12);color:var(--warning);}
-.risk-icon-high{background:rgba(255,77,106,0.12);color:var(--danger);}
-.risk-icon-none{background:var(--border);color:var(--text3);}
+
 .risk-name{font-family:var(--mono);font-size:13px;font-weight:500;}
 .risk-sub{font-size:11px;color:var(--text3);margin-top:3px;}
 
@@ -303,44 +232,7 @@ html,body{
 .json-key{color:var(--text2);}
 .json-str{color:var(--accent);}
 .json-num{color:var(--success);}
-.json-warn{color:var(--warning);}
 
-/* Model info table */
-/* .info-row{
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:12px;padding:9px 0;
-  border-bottom:1px solid var(--border);
-}
-.info-row:last-child{border-bottom:none;}
-.info-key{color:var(--text3);font-family:var(--mono);}
-.info-val{color:var(--text);font-family:var(--mono);} */
-
-/* ── Docs view ────────────────────────────────────────────────── */
-/* #docs-view{padding:36px;max-width:780px;}
-#docs-view .page-title{font-size:22px;margin-bottom:6px;}
-
-.docs-section{margin-top:28px;}
-.docs-section .section-label{margin-bottom:12px;}
-
-.schema-table{
-  width:100%;border-collapse:collapse;
-  font-size:12px;font-family:var(--mono);
-}
-.schema-table th{
-  text-align:left;padding:8px 12px;
-  background:var(--surface);
-  color:var(--text3);font-weight:500;
-  border:1px solid var(--border);font-size:10px;
-  letter-spacing:0.08em;text-transform:uppercase;
-}
-.schema-table td{
-  padding:8px 12px;
-  border:1px solid var(--border);
-  color:var(--text2);vertical-align:top;
-}
-.schema-table td:first-child{color:var(--accent);}
-.schema-table tr:hover td{background:var(--surface);}
-*/
 input[type="file"]{display:none;} 
 </style>
 </head>
@@ -349,14 +241,11 @@ input[type="file"]{display:none;}
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
 <!-- SCAN VIEW                                                                  -->
 <!-- ══════════════════════════════════════════════════════════════════════════ -->
-<div id="scan-view" class="active">
+<div id="scan-view">
   <!-- Left panel -->
   <div class="left-panel">
     <p class="page-title">Chest X-Ray<br>Pneumonia Detection</p>
-    <!-- <p class="page-sub">// ResNet-50 transfer learning · FastAPI /predict endpoint</p> -->
-
-    <div class="section-label">Upload X-Ray Image</div>
-    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
       <div class="xray-preview" id="previewBox">
         <img class="preview-img" id="previewImg" alt="X-Ray preview"/>
         <svg id="previewPlaceholder" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -368,17 +257,10 @@ input[type="file"]{display:none;}
           <line x1="26" y1="52" x2="38" y2="52" stroke="#4A5E7A" stroke-width="1" opacity="0.45"/>
         </svg>
       </div>
-      <p class="upload-label" id="uploadLabel">Drop X-Ray here or click to browse</p>
-      <p class="upload-hint">JPEG · PNG · min 224 × 224 px</p>
-      <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this)"/>
+      <p class="upload-label" id="uploadLabel">Click to browse X-Ray</p>
+      <input type="file" id="fileInput" accept="image/*" onchange="processFile(this)"/>
     </div>
-
-    <div class="loading-bar" id="loadingBar">
-      <div class="loading-fill"></div>
-    </div>
-
     <button class="scan-btn" id="scanBtn" onclick="runDiagnosis()" disabled>
-      <div class="btn-shine"></div>
       Run Diagnostic Analysis
     </button>
   </div>
@@ -387,16 +269,12 @@ input[type="file"]{display:none;}
   <div class="right-panel">
     <div class="result-header">
       <div class="result-title">Diagnostic Result</div>
-      <div class="result-status" id="resultStatus">
-        Awaiting image
-        <span class="result-badge badge-waiting" id="diagBadge">PENDING</span>
-      </div>
+      <div class="result-status" id="resultStatus"> Awaiting image </div>
     </div>
 
     <div class="tabs">
-      <button class="tab active" onclick="switchResultTab(this,'result')">Result</button>
+      <button class="tab" onclick="switchResultTab(this,'result')">Result</button>
       <button class="tab" onclick="switchResultTab(this,'response')">JSON Response</button>
-      <!-- <button class="tab" onclick="switchResultTab(this,'info')">Model Info</button> -->
     </div>
 
     <!-- Result tab -->
@@ -415,7 +293,7 @@ input[type="file"]{display:none;}
       </div>
 
       <div class="risk-indicator">
-        <div class="risk-icon risk-icon-none" id="riskIcon">?</div>
+        <div class="risk-icon" id="riskIcon">?</div>
         <div>
           <div class="risk-name" id="riskName" style="color:var(--text3)">No analysis yet</div>
           <div class="risk-sub" id="riskSub">Upload an X-Ray image to begin</div>
@@ -439,233 +317,98 @@ input[type="file"]{display:none;}
     <div class="tab-content" id="response-tab">
       <div class="section-label" style="margin-bottom:12px;">FastAPI /predict — Response Body</div>
       <div class="json-block">{
-  <span class="json-key">"diagnosis"</span>:   <span class="json-str" id="j-diag">"—"</span>,
-  <span class="json-key">"confidence"</span>:  <span class="json-num" id="j-conf">null</span>,
-  <span class="json-key">"risk_level"</span>:  <span class="json-str" id="j-risk">"—"</span>,
-  <span class="json-key">"disclaimer"</span>:  <span class="json-warn">"Screening tool only"</span>,
-  <span class="json-key">"model"</span>:        <span class="json-str">"ResNet-50 (transfer learning)"</span>,
-  <span class="json-key">"version"</span>:      <span class="json-str">"1.0.0"</span>
-}</div>
+        <span class="json-key">"class"</span>:   <span class="json-str" id="j-diag">"—"</span>,
+        <span class="json-key">"confidence"</span>:  <span class="json-num" id="j-conf">null</span>,
+        <span class="json-key">"risk_level"</span>:  <span class="json-str" id="j-risk">"—"</span>}
+      </div>
       <p style="margin-top:14px;font-size:11px;color:var(--text3);font-family:var(--mono);">
         Swagger UI: <a href="http://localhost:8000/docs" style="color:var(--accent);text-decoration:none;">http://localhost:8000/docs</a>
       </p>
     </div>
 
-    <!-- Model info tab -->
-    <!-- <div class="tab-content" id="info-tab">
-      <div class="section-label" style="margin-bottom:14px;">Model Architecture</div>
-      <div class="info-row"><span class="info-key">Base model</span><span class="info-val">ResNet-18</span></div>
-      <div class="info-row"><span class="info-key">Pretrained weights</span><span class="info-val">ImageNet (ILSVRC)</span></div>
-      <div class="info-row"><span class="info-key">Fine-tuned head</span><span class="info-val">2048 → 512 → 2 classes</span></div>
-      <div class="info-row"><span class="info-key">Input resolution</span><span class="info-val">224 × 224 px</span></div>
-      <div class="info-row"><span class="info-key">Output classes</span><span class="info-val">NORMAL / PNEUMONIA</span></div>
-      <div class="info-row"><span class="info-key">Framework</span><span class="info-val">PyTorch + TorchVision</span></div>
-      <div class="info-row"><span class="info-key">Serving</span><span class="info-val">FastAPI + Uvicorn</span></div>
-      <div class="info-row"><span class="info-key">Preprocessing</span><span class="info-val">Resize → Normalize (ImageNet)</span></div>
-      <div class="info-row"><span class="info-key">Deployment</span><span class="info-val">Docker (multi-stage)</span></div>
-      <div class="info-row"><span class="info-key">Risk HIGH threshold</span><span class="info-val">confidence ≥ 0.85</span></div>
-      <div class="info-row"><span class="info-key">Risk MEDIUM threshold</span><span class="info-val">confidence ≥ 0.65</span></div>
-    </div> -->
   </div>
 </div>
-
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!-- DOCS VIEW                                                                  -->
-<!-- ══════════════════════════════════════════════════════════════════════════ -->
-<!-- <div id="docs-view" class="view">
-  <p class="page-title">API Reference</p>
-  <p class="page-sub" style="margin-bottom:8px;">// FastAPI /predict · Swagger UI at <a href="http://localhost:8000/docs" style="color:var(--accent);text-decoration:none;">localhost:8000/docs</a></p>
-
-  <div class="docs-section">
-    <div class="section-label">POST /predict</div>
-    <div class="code-block"><span class="c-dec">@app</span>.<span class="c-fn">post</span>(<span class="c-str">"/predict"</span>, response_model=PredictionResponse)
-<span class="c-kw">async def</span> <span class="c-fn">predict</span>(file: UploadFile = File(...)):
-    <span class="c-str">"""
-    Accepts chest X-Ray image (JPEG / PNG).
-    Returns diagnosis, confidence, risk level + disclaimer.
-    """</span>
-    img = Image.<span class="c-fn">open</span>(io.<span class="c-fn">BytesIO</span>(<span class="c-kw">await</span> file.<span class="c-fn">read</span>())).<span class="c-fn">convert</span>(<span class="c-str">"RGB"</span>)
-    tensor = <span class="c-fn">preprocess</span>(img).<span class="c-fn">unsqueeze</span>(<span class="c-num">0</span>).<span class="c-fn">to</span>(DEVICE)
-    <span class="c-kw">with</span> torch.no_grad():
-        probs = torch.<span class="c-fn">softmax</span>(model(tensor), dim=<span class="c-num">1</span>)[<span class="c-num">0</span>]
-    confidence = <span class="c-fn">float</span>(probs.<span class="c-fn">max</span>())
-    diagnosis  = CLASSES[probs.<span class="c-fn">argmax</span>()]
-    <span class="c-kw">return</span> {
-        <span class="c-str">"diagnosis"</span>:  diagnosis,
-        <span class="c-str">"confidence"</span>: confidence,
-        <span class="c-str">"risk_level"</span>: <span class="c-fn">get_risk_level</span>(confidence, diagnosis),
-        <span class="c-str">"disclaimer"</span>: <span class="c-str">"Screening tool only"</span>
-    }</div>
-  </div>
-
-  <div class="docs-section">
-    <div class="section-label">Response Schema</div>
-    <table class="schema-table">
-      <thead>
-        <tr>
-          <th>Field</th><th>Type</th><th>Example</th><th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>diagnosis</td><td>string</td><td>"PNEUMONIA"</td><td>NORMAL or PNEUMONIA</td></tr>
-        <tr><td>confidence</td><td>float</td><td>0.91</td><td>Model probability 0–1</td></tr>
-        <tr><td>risk_level</td><td>string</td><td>"HIGH"</td><td>LOW / MEDIUM / HIGH</td></tr>
-        <tr><td>disclaimer</td><td>string</td><td>"Screening tool only"</td><td>Always present</td></tr>
-        <tr><td>model</td><td>string</td><td>"ResNet-50 ..."</td><td>Model identifier</td></tr>
-        <tr><td>version</td><td>string</td><td>"1.0.0"</td><td>API version</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="docs-section">
-    <div class="section-label">Risk Level Logic</div>
-    <div class="code-block"><span class="c-kw">def</span> <span class="c-fn">get_risk_level</span>(confidence, diagnosis):
-    <span class="c-kw">if</span> diagnosis == <span class="c-str">"NORMAL"</span>:  <span class="c-kw">return</span> <span class="c-str">"LOW"</span>
-    <span class="c-kw">if</span> confidence >= <span class="c-num">0.85</span>:     <span class="c-kw">return</span> <span class="c-str">"HIGH"</span>
-    <span class="c-kw">if</span> confidence >= <span class="c-num">0.65</span>:     <span class="c-kw">return</span> <span class="c-str">"MEDIUM"</span>
-    <span class="c-kw">return</span> <span class="c-str">"LOW"</span></div>
-  </div>
-
-  <div class="docs-section">
-    <div class="section-label">Docker Deployment</div>
-    <div class="code-block"><span class="c-cm"># Build and run</span>
-docker build -t pneumoscan .
-docker run -p <span class="c-num">8000</span>:<span class="c-num">8000</span> \
-  -v $(pwd)/model.pth:/app/model.pth \
-  pneumoscan
-
-<span class="c-cm"># Or with Docker Compose</span>
-docker-compose up --build
-
-<span class="c-cm"># Local dev</span>
-uvicorn app:app --reload --port <span class="c-num">8000</span></div>
-  </div>
-</div> -->
 
 <!-- ── JavaScript ─────────────────────────────────────────────────────────── -->
 <script>
 let selectedFile = null;
 
-/* ── Drag & drop ── */
-const uploadZone = document.getElementById('uploadZone');
-uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-uploadZone.addEventListener('dragleave', ()  => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('drag-over');
-  const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith('image/')) processFile(f);
-});
+function processFile(input) {
+  if (input.files[0])
+  {
+    selectedFile = input.files[0];
+    const reader = new FileReader();
+    reader.onload = e =>
+    {
+      const img = document.getElementById('previewImg');
+      img.src = e.target.result;
+      img.style.display = 'block';
+      document.getElementById('previewPlaceholder').style.display = 'none';
+      document.getElementById('uploadLabel').textContent = selectedFile.name;
+      document.getElementById('scanBtn').disabled = false;
+    };
+    reader.readAsDataURL(selectedFile);
+  }
+  else
+    return;
+  }
 
-function handleFile(input) {
-  if (input.files[0]) processFile(input.files[0]);
-}
-
-function processFile(file) {
-  selectedFile = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = document.getElementById('previewImg');
-    img.src = e.target.result;
-    img.style.display = 'block';
-    document.getElementById('previewPlaceholder').style.display = 'none';
-    document.getElementById('uploadLabel').textContent = file.name;
-    document.getElementById('scanBtn').disabled = false;
-  };
-  reader.readAsDataURL(file);
-}
-
-/* ── Diagnosis (connects to FastAPI; falls back to simulation) ── */
 async function runDiagnosis() {
   if (!selectedFile) return;
   const btn = document.getElementById('scanBtn');
-  const lb  = document.getElementById('loadingBar');
   btn.disabled = true;
   btn.textContent = 'Analyzing…';
-  lb.style.display = 'block';
-
-    const form = new FormData();
-    form.append('file', selectedFile);
-    const resp = await fetch('http://localhost:8000/predict', {
-      method: 'POST', body: form
-    });
-    if (!resp.ok) throw new Error('API error');
-    const data = await resp.json();
-    console.log(data)
-    applyResult(data.class, data.confidence);
-    console.log("work");
-
-  lb.style.display = 'none';
+  
+  const form = new FormData();
+  form.append('file', selectedFile);
+  const resp = await fetch('http://localhost:8000/predict', {
+    method: 'POST', body: form
+  });
+  if (!resp.ok) throw new Error('API error');
+  const data = await resp.json();
+  applyResult(data.class, data.confidence, data.risk_level);
   btn.disabled = false;
-  btn.innerHTML = '<div class="btn-shine"></div>Run Diagnostic Analysis';
+  btn.textContent = 'Run Diagnostic Analysis';
 }
 
-function applyResult(diagnosis, confidence) {
-  const isPneumonia = diagnosis === "PNEUMONIA";
-  const pct  = (confidence * 100).toFixed(1);
-  const risk = (isPneumonia) ? 
-  ((pct > 61) ? ("HIGH") : ((pct > 25) ? ("MEDIUM") : ("LOW"))) :
-  ((pct > 61) ? ("LOW") : ((pct > 25) ? ("MEDIUM") : ("HIGH")));
-  const confPct = pct + '%';
+function applyResult(diagnosis, confidence, risk_level) {
+  const pct  = ((confidence * 100).toFixed(1)) + '%';
+
   /* Status bar */
-  const statusEl = document.getElementById('resultStatus');
-  statusEl.childNodes[0].nodeValue = diagnosis + ' ';
-  const badge = document.getElementById('diagBadge');
-  badge.textContent = diagnosis;
-  badge.className = 'result-badge ' + (isPneumonia ? 'badge-pneumonia' : 'badge-normal');
+  document.getElementById('resultStatus').textContent = diagnosis + ' ';
 
-  /* Confidence metric */
-  document.getElementById('confValue').textContent = confPct;
-  const confBar = document.getElementById('confBar');
-  confBar.style.background = isPneumonia ? 'var(--danger)' : 'var(--success)';
-  setTimeout(() => confBar.style.width = (confidence * 100) + '%', 50);
-
-  /* Risk metric */
   const riskColors = { LOW:'var(--success)', MEDIUM:'var(--warning)', HIGH:'var(--danger)' };
   const riskWidths  = { LOW:'18%', MEDIUM:'55%', HIGH:'100%' };
-  const riskIconCls = { LOW:'risk-icon-low', MEDIUM:'risk-icon-med', HIGH:'risk-icon-high' };
   const riskSymbols = { LOW:'✓', MEDIUM:'!', HIGH:'!!' };
-
-  document.getElementById('riskValue').textContent = risk;
-  document.getElementById('riskValue').style.color = riskColors[risk];
+  
+  /* Confidence metric */
+  document.getElementById('confValue').textContent = pct;
+  const confBar = document.getElementById('confBar');
+  confBar.style.background = riskColors[risk_level]
+  setTimeout(() => confBar.style.width = pct, 50);
+  
+  /* Risk metric */
+  document.getElementById('riskValue').textContent = risk_level;
+  document.getElementById('riskValue').style.color = riskColors[risk_level];
   const riskBar = document.getElementById('riskBar');
-  riskBar.style.background = riskColors[risk];
-  setTimeout(() => riskBar.style.width = riskWidths[risk], 50);
+  riskBar.style.background = riskColors[risk_level];
+  setTimeout(() => riskBar.style.width = riskWidths[risk_level], 50);
 
   /* Risk indicator */
   const riskIcon = document.getElementById('riskIcon');
-  riskIcon.className = 'risk-icon ' + riskIconCls[risk];
-  riskIcon.textContent = riskSymbols[risk];
-  document.getElementById('riskName').style.color = riskColors[risk];
-  document.getElementById('riskName').textContent = risk + ' RISK — ' + diagnosis;
-  document.getElementById('riskSub').textContent  = isPneumonia
+  riskIcon.style.color = riskColors[risk_level];
+  riskIcon.textContent = riskSymbols[risk_level];
+  document.getElementById('riskName').style.color = riskColors[risk_level];
+  document.getElementById('riskName').textContent = risk_level + ' RISK — ' + diagnosis;
+  document.getElementById('riskSub').textContent  = diagnosis === "PNEUMONIA"
     ? 'Recommend immediate radiologist review'
     : 'No indicators of pneumonia detected';
 
   /* JSON tab */
   document.getElementById('j-diag').textContent = '"' + diagnosis + '"';
-  document.getElementById('j-conf').textContent = confidence.toFixed(2);
-  document.getElementById('j-risk').textContent = '"' + risk + '"';
+  document.getElementById('j-conf').textContent = '"' + confidence + '"';
+  document.getElementById('j-risk').textContent = '"' + risk_level + '"';
 
-}
-
-/* ── View switching ── */
-function showView(id, btn) {
-  document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-
-  /* Hide all */
-  document.getElementById('scan-view').classList.remove('active');
-  document.getElementById('scan-view').style.display = 'none';
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-
-  if (id === 'scan') {
-    document.getElementById('scan-view').style.display = 'grid';
-    document.getElementById('scan-view').classList.add('active');
-  } else {
-    const el = document.getElementById(id + '-view');
-    el.classList.add('active');
-  }
 }
 
 /* ── Result tab switching ── */
