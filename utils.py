@@ -30,19 +30,16 @@ def load_your_model(model_path:str=PATH_MODEL, config_path:str=PATH_MODEL_CONFIG
         model, config, preprocess = load_saved_model(model_path, config_path)
     '''
     if device is None:
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        device= torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     config = load_config(config_path)
 
-    # Create model
-    model = models.resnet18(weights=None)
-    model.fc = nn.Linear(model.fc.in_features, len(config['classes']))
-    
-    # Load weights
-    model.load_state_dict(torch.load(model_path, map_location=device))
-    model.to(device)
+    if   config['model']=='DenseNet121': model= models.densenet121(weights=None); model.classifier= nn.Linear(model.classifier.in_features, len(config['classes']))
+    elif config['model']=='ResNet18':    model= models.resnet18(   weights=None); model.fc        = nn.Linear(model.fc.in_features,         len(config['classes']))
+    else: print('Model Loading Error: Failed to identify model architecture'); exit(1)
+    model.load_state_dict(torch.load(model_path, map_location=device, weights_only=True))
     model.eval()
-    
+        
     # Define preprocess func
     preprocess = transforms.Compose([
         transforms.Resize(config['input_size']),

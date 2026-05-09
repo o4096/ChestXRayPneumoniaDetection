@@ -1,10 +1,11 @@
 {
-    "model": "ResNet18",
-    "input_size": [224, 224],
-    "classes": [
-	"NORMAL",
-	"PNEUMONIA"
-    ],
-    "best_threshold": 0.1
+	"model": "DenseNet121",
+	"input_size": [
+		244,
+		244
+	],
+	"classes": [
+		"NORMAL",
+		"PNEUMONIA"
+	]
 }
-

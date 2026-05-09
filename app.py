@@ -1,12 +1,10 @@
  # app.py
+import torch, io
 from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
-import torch, io
 from utils import load_your_model
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-
 
 app = FastAPI(title='Pneumonia Detection API')
 app.add_middleware(
@@ -22,7 +20,6 @@ model, config, preprocess = load_your_model()
 def root():
     return FileResponse("index.html")
 
-
 @app.post('/predict')
 async def predict(file: UploadFile = File(...)):
     img = Image.open(io.BytesIO(await file.read())).convert('RGB')
@@ -37,4 +34,3 @@ async def predict(file: UploadFile = File(...)):
             'confidence': confidence,
             'risk_level': risk_level}
            
-
