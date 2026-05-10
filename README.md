@@ -32,26 +32,3 @@ docker rm pneumo-server
 Access the frontend dashboard through `localhost:8000`.
 View backend documentation through `localhost:8000/docs`.
 
-## TODOs:
-
-#### eda.ipynb
-- Add more diverse visualizations.
-- Write down insights/observations.
-
-#### train.ipynb
-- Extract constants and params into a config YAML file or just a separate reference notebook (maybe).
-
-#### test.ipynb
-- Separate the code from train.ipynb
-- Fix the recall threshold tuning and use it in deployment.
-
-### Required Deliverables
-- 1. EDA Notebook - 8+ visualizations with written insights.
-~~- 2. Trained Model - Exported as .pth file.~~
-~~- 3. Training Report - Loss/accuracy curves, best epoch, final metrics.~~
-~~- 4. Evaluation - Confusion matrix, Precision/Recall/F1, ROC-AUC, threshold tuning for Recall.~~
-~~- 5. FastAPI App - /predict endpoint accepting image uploads.~~
-~~- 6. Dockerfile - Containerized deployment ready.~~
-~~- 7. Test Script - Automated API testing (`test_api.py`).~~
-~~- 8. Presentation - 10-minute demo with live API test.~~
-
