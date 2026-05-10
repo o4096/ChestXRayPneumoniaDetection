@@ -1,11 +1,1 @@
-{
-	"model": "DenseNet121",
-	"input_size": [
-		244,
-		244
-	],
-	"classes": [
-		"NORMAL",
-		"PNEUMONIA"
-	]
-}
+{"model": "DenseNet121", "input_size": [244, 244], "classes": ["NORMAL", "PNEUMONIA"], "best_threshold": 0.1}
