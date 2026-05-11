@@ -1,7 +1,11 @@
 # ChestXRayPneumoniaDetection
 Fine-tuned ResNet18 and DenseNet121 for Pneumonia Detection (Image Classification)
 
-## Build
+Dataset used: https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
+
+![gif](assets/demonstration.gif)
+
+## Build 
 ### Python
 ```
 pip install -r requirements.txt
