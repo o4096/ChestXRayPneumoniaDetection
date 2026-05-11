@@ -13,7 +13,7 @@ python -m uvicorn app:app --reload --port 8000
 ### Docker
 build the server container (use `--network=host` to bypass bridge and potentially speed up the build process)
 ```shell
-docker build -t pneumo-detect
+docker build -t pneumo-detect .
 ```
 run the server container
 ```shell
