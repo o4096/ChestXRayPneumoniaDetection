@@ -19,7 +19,7 @@ run the server container
 ```shell
 docker run -d -p 8000:8000 --name pneumo-server pneumo-detect
 ```
-Stop the server container
+Stop the server container after usage
 ```shell
 docker stop pneumo-server
 ```
@@ -30,5 +30,12 @@ docker rm pneumo-server
 
 ## Usage
 Access the frontend dashboard through `localhost:8000`.
-View backend documentation through `localhost:8000/docs`.
+View Swagger UI documentation through `localhost:8000/docs`.
+
+### Curl
+```shell
+curl -X POST http://localhost:8000/predict -F "file=@image.jpg"
+```
+
+
 
